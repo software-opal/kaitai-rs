@@ -1,0 +1,18 @@
+[package]
+name = "kaitai-rs"
+version = "0.1.0"
+authors = ["Opal Symes <code@opal.codes>"]
+edition = "2018"
+
+[workspace]
+members = ["kaitai-loader"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+proc-macro2 = { version = "1", default-features = false }
+quote = "1.0"
+
+
+[patch.crates-io]
+schemafy = { git = 'https://github.com/software-opal/schemafy' }

@@ -1,0 +1,761 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "Adapted by fixing the patternProperties from https://github.com/kaitai-io/ksy_schema/blob/e2c3fc00d58ebbf35b3eecc697aa8099bdf577b3/ksy_schema.json",
+  "title": "ksy schema",
+  "description": "the schema for ksy files",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "#/definitions/MetaSpec",
+      "required": [
+        "id"
+      ]
+    },
+    "doc": {
+      "$ref": "#/definitions/Doc"
+    },
+    "doc-ref": {
+      "$ref": "#/definitions/DocRef"
+    },
+    "params": {
+      "$ref": "#/definitions/ParamsSpec"
+    },
+    "seq": {
+      "description": "identifier for a primary structure described in top-level map",
+      "$ref": "#/definitions/Attributes"
+    },
+    "types": {
+      "description": "maps of strings to user-defined types\n\ndeclares types for substructures that can be referenced in the attributes of seq or instances element\n\nwould be directly translated into classes",
+      "$ref": "#/definitions/TypesSpec"
+    },
+    "instances": {
+      "description": "Purpose: description of data that lies outside of normal sequential parsing flow (for example, that requires seeking somewhere in the file) or just needs to be loaded only by special request\n\nInfluences: would be translated into distinct methods (that read desired data on demand) in current class",
+      "$ref": "#/definitions/InstancesSpec"
+    },
+    "enums": {
+      "description": "allows for the setup of named enums, mappings of integer constants to symbolic names. Can be used with integer attributes using the enum key.\n\nwould be represented as enum-like construct (or closest equivalent, if target language doesn’t support enums), nested or namespaced in current type/class",
+      "$ref": "#/definitions/EnumsSpec"
+    }
+  },
+  "patternProperties": {
+    "^-.*$": { "type": ["array", "boolean", "integer", "null", "number", "object", "string" ] }
+  },
+  "definitions": {
+    "Doc": {
+      "type": "string",
+      "description": "used to give a more detailed description of a user-defined type. In most languages, it will be used as a docstring compatible with tools like Javadoc, Doxygen, JSDoc, etc."
+    },
+    "DocRef": {
+      "description": "used to provide reference to original documentation (if the ksy file is actually an implementation of some documented format).\n\nContains:\n1. URL as text,\n2. arbitrary string, or\n3. URL as text + space + arbitrary string",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "MediaWikiPageName": {
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9$\\-._~+!*'(),@&;:\\/]+|%[0-9a-fA-F]{2})+$",
+      "$comment": "hand-crafted regex, it should match any valid URL path"
+    },
+    "IsoIdentifier": {
+      "type": "string",
+      "pattern": "^[1-9]\\d*([-–][0-9]+)?(:(19|20)\\d{2})?$",
+      "$comment": "https://www.wikidata.org/wiki/Property:P503#P1793"
+    },
+    "LocIdentifier": {
+      "type": "string",
+      "pattern": "^fdd\\d{6}$",
+      "$comment": "https://www.wikidata.org/wiki/Property:P3266#P1793"
+    },
+    "MimeType": {
+      "type": "string",
+      "pattern": "^(application|audio|font|image|model|text|video)\/([a-zA-Z0-9]+[.\\-_+]?)*[a-zA-Z0-9]$",
+      "$comment": "this regex pattern is hand-crafted and not coming from any specification, but it's tested against all registered discrete IANA media types (multipart types don't make sense for Kaitai Struct)"
+    },
+    "PronomIdentifier": {
+      "type": "string",
+      "pattern": "^(x-)?fmt\\/\\d+$",
+      "$comment": "https://www.wikidata.org/wiki/Property:P2748#P1793"
+    },
+    "RfcIdentifier": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "string",
+          "pattern": "^[1-9]\\d*$",
+          "$comment": "https://www.wikidata.org/wiki/Property:P892#P1793"
+        }
+      ]
+    },
+    "WikidataIdentifier": {
+      "type": "string",
+      "pattern": "^Q[1-9]\\d*$",
+      "$comment": "https://www.wikidata.org/wiki/Q43649390#P1793"
+    },
+    "MetaSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Identifier"
+        },
+        "title": {
+          "type": "string"
+        },
+        "application": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "file-extension": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "xref": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "forensicswiki": {
+              "description": "article name at [Forensics Wiki](https://forensicswiki.xyz/page/Main_Page), which is a CC-BY-SA-licensed wiki with information on digital forensics, file formats and tools\n\nfull link name could be generated as `https://forensicswiki.xyz/page/` + this value",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/MediaWikiPageName"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MediaWikiPageName"
+                  }
+                }
+              ]
+            },
+            "iso": {
+              "description": "ISO/IEC standard number, reference to a standard accepted and published by [ISO](https://www.iso.org/) (International Organization for Standardization).\n\nISO standards typically have clear designations like \"ISO/IEC 15948:2004\", so value should be citing everything except for \"ISO/IEC\", i.e. `15948:2004`",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/IsoIdentifier"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/IsoIdentifier"
+                  }
+                }
+              ]
+            },
+            "justsolve": {
+              "description": "article name at [\"Just Solve the File Format Problem\" wiki](http://fileformats.archiveteam.org/wiki/Main_Page), a wiki that collects information on many file formats\n\nfull link name could be generated as `http://fileformats.archiveteam.org/wiki/` + this value",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/MediaWikiPageName"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MediaWikiPageName"
+                  }
+                }
+              ]
+            },
+            "loc": {
+              "description": "identifier in [Digital Formats](https://www.loc.gov/preservation/digital/formats/fdd/browse_list.shtml) database of [US Library of Congress](https://www.loc.gov/)\n\nvalue typically looks like `fddXXXXXX`, where `XXXXXX` is a 6-digit identifier",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/LocIdentifier"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/LocIdentifier"
+                  }
+                }
+              ]
+            },
+            "mime": {
+              "description": "MIME type (IANA media type), a string typically used in various Internet protocols to specify format of binary payload\n\nthere is a [central registry of media types](https://www.iana.org/assignments/media-types/media-types.xhtml) managed by IANA\n\nvalue must specify full MIME type (both parts), e.g. `image/png`",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/MimeType"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MimeType"
+                  }
+                }
+              ]
+            },
+            "pronom": {
+              "description": "format identifier in [PRONOM Technical Registry](https://www.nationalarchives.gov.uk/PRONOM/Default.aspx) of [UK National Archives](https://www.nationalarchives.gov.uk/), which is a massive file formats database that catalogues many file formats for digital preservation purposes",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/PronomIdentifier"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PronomIdentifier"
+                  }
+                }
+              ]
+            },
+            "rfc": {
+              "description": "reference to [RFC](https://en.wikipedia.org/wiki/Request_for_Comments), \"Request for Comments\" documents maintained by ISOC (Internet Society)\n\nRFCs are typically treated as global, Internet-wide standards, and, for example, many networking / interoperability protocols are specified in RFCs\n\nvalue should be just raw RFC number, without any prefixes, e.g. `1234`",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/RfcIdentifier"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/RfcIdentifier"
+                  }
+                }
+              ]
+            },
+            "wikidata": {
+              "description": "item identifier at Wikidata, a global knowledge base\n\nvalue typically follows `Qxxx` pattern, where `xxx` is a number generated by Wikidata, e.g. `Q535473`",
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/WikidataIdentifier"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/WikidataIdentifier"
+                  }
+                }
+              ]
+            }
+          },
+          "patternProperties": {
+            "^.*$": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/AnyScalar"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/AnyScalar"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "license": {
+          "type": "string"
+        },
+        "ks-version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "ks-debug": {
+          "type": "boolean",
+          "description": "advise the Kaitai Struct Compiler (KSC) to use debug mode",
+          "default": false
+        },
+        "ks-opaque-types": {
+          "type": "boolean",
+          "description": "advise the Kaitai Struct Compiler (KSC) to ignore missing types in the .ksy file, and assume that these types are already provided externally by the environment the classes are generated for",
+          "default": false
+        },
+        "imports": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(.*/)?[a-z][a-z0-9_]*$"
+          }
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "endian": {
+          "anyOf": [
+            {
+              "enum": [
+                "le",
+                "be"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "switch-on": {
+                  "$ref": "#/definitions/AnyScalar"
+                },
+                "cases": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^.*$": {
+                      "enum": [
+                        "le",
+                        "be"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "switch-on",
+                "cases"
+              ]
+            }
+          ]
+        }
+      },
+      "patternProperties": {
+        "^-.*$": { "type": ["array", "boolean", "integer", "null", "number", "object", "string" ] }
+      }
+    },
+    "Attribute": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "contains a string that matches /^[a-z][a-z0-9_]*$/ used to identify one attribute among others"
+        },
+        "doc": {
+          "$ref": "#/definitions/Doc"
+        },
+        "doc-ref": {
+          "$ref": "#/definitions/DocRef"
+        },
+        "contents": {
+          "description": "specify fixed contents that the parser should encounter at this point. If the content of the stream doesn't match the given bytes, an error is thrown and it's meaningless to continue parsing",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StringOrInteger"
+              }
+            }
+          ]
+        },
+        "type": {
+          "description": "defines data type for an attribute can also be user-defined https://doc.kaitai.io/ksy_reference.html#attribute-type",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "switch-on": {
+                  "$ref": "#/definitions/AnyScalar"
+                },
+                "cases": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^.*$": {
+                      "$ref": "#/definitions/AnyScalar"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "switch-on",
+                "cases"
+              ]
+            },
+            {
+              "type": "string",
+              "enum": [
+                "u1",
+                "u2",
+                "u2le",
+                "u2be",
+                "u4",
+                "u4le",
+                "u4be",
+                "u8",
+                "u8le",
+                "u8be",
+                "s1",
+                "s2",
+                "s2le",
+                "s2be",
+                "s4",
+                "s4le",
+                "s4be",
+                "s8",
+                "s8le",
+                "s8be",
+                "f4",
+                "f4be",
+                "f4le",
+                "f8",
+                "f8be",
+                "f8le",
+                "str",
+                "strz"
+              ]
+            }
+          ]
+        },
+        "repeat": {
+          "description": "designates repeated attribute in a structure\n\n| Value     | Description\n|-\n| `expr`    | repeated amount specifified in `repeat-expr`\n| `eos`     | repeated until the end of the current stream\n| `until`   | repeated until given expression in `repeat-until` is true\n\nattribute read as array/list/sequence",
+          "enum": [
+            "expr",
+            "eos",
+            "until"
+          ]
+        },
+        "repeat-expr": {
+          "description": "specify number of repetitions for repeated attribute",
+          "$ref": "#/definitions/StringOrInteger"
+        },
+        "repeat-until": {
+          "description": "expression of boolean type\n\nspecifies expression to be checked each time this is parsed, repeating until the expression is false. One can use `_` as a special variable that references the last read element",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "if": {
+          "description": "expected to be boolean expression\n\nmarks the attribute as optional (attribute is parsed only if condition specified evaluates to true)",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "size": {
+          "description": "the number of bytes to read if `type` isn't defined.\n\ncan also be an expression",
+          "$ref": "#/definitions/StringOrInteger"
+        },
+        "size-eos": {
+          "description": "reads all the bytes till the end of the stream",
+          "type": "boolean"
+        },
+        "process": {
+          "description": "processes the byte buffer before acces",
+          "type": "string",
+          "pattern": "^zlib|(xor|rol|ror)\\(.*\\)$"
+        },
+        "enum": {
+          "description": "name of existing enum field data type becomes given enum",
+          "type": "string",
+          "pattern": "^([a-z][a-z0-9_]*::)*[a-z][a-z0-9_]*$"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "pad-right": {
+          "type": "integer",
+          "description": "specify a byte which is the string or byte array padded with after the end up to the total size\n\ncan be used only with `size` or `size-eos: true` (when the size is fixed)\n\nwhen `terminator`:\n - isn't specified, then the `pad-right` controls where the string ends (basically acts like a terminator)\n - is specified, padding comes after the terminator, not before. The value is terminated immediately after the terminator occurs, so the `pad-right` has no effect on parsing and is only relevant for serialization"
+        },
+        "terminator": {
+          "type": "integer",
+          "description": "string or byte array reading will stop when it encounters this byte\n\ncannot be used with `type: strz` (which already implies `terminator: 0` - null-terminated string)"
+        },
+        "consume": {
+          "type": "boolean",
+          "description": "specify if terminator byte should be \"consumed\" when reading\n\nif true: the stream pointer will point to the byte after the terminator byte\n\nif false: the stream pointer will point to the terminator byte itself\n\ndefault is true",
+          "default": true
+        },
+        "include": {
+          "type": "boolean",
+          "description": "specifies if terminator byte should be considered part of the string read and thus be appended to it\n\ndefault is false",
+          "default": false
+        },
+        "eos-error": {
+          "type": "boolean",
+          "description": "allows the compiler to ignore the lack of a terminator if eos-error is disabled, string reading will stop at either:\n\n1. terminator being encountered\n\n2. end of stream is reached\n\ndefault is TRUE",
+          "default": true
+        },
+        "pos": {
+          "description": "specifies position at which the value should be parsed",
+          "$ref": "#/definitions/StringOrInteger"
+        },
+        "io": {
+          "type": "string",
+          "description": "specifies an IO stream from which a value should be parsed"
+        },
+        "value": {
+          "description": "overrides any reading & parsing. Instead, just calculates function specified in value and returns the result as this instance. Has many purposes"
+        }
+      },
+      "patternProperties": {
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "strz"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "terminator"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "pad-right"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "size"
+                ]
+              },
+              {
+                "properties": {
+                  "size-eos": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "size-eos"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "Attributes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Attribute"
+      }
+    },
+    "StringOrInteger": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        }
+      ]
+    },
+    "TypeSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/MetaSpec"
+        },
+        "params": {
+          "$ref": "#/definitions/ParamsSpec"
+        },
+        "seq": {
+          "$ref": "#/definitions/Attributes"
+        },
+        "types": {
+          "$ref": "#/definitions/TypesSpec"
+        },
+        "enums": {
+          "$ref": "#/definitions/EnumsSpec"
+        },
+        "instances": {
+          "$ref": "#/definitions/InstancesSpec"
+        },
+        "doc": {
+          "$ref": "#/definitions/Doc"
+        },
+        "doc-ref": {
+          "$ref": "#/definitions/DocRef"
+        }
+      },
+      "patternProperties": {
+        "^-.*$": { "type": ["array", "boolean", "integer", "null", "number", "object", "string" ] }
+      }
+    },
+    "TypesSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*$": {
+          "$ref": "#/definitions/TypeSpec"
+        }
+      }
+    },
+    "ParamSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Identifier"
+        },
+        "type": {
+          "description": "specifies \"pure\" type of the parameter, without any serialization details (like endianness, sizes, encodings)\n\n| Value                  | Description\n|-\n| `u1`, `u2`, `u4`, `u8` | unsigned integer\n| `s1`, `s2`, `s4`, `s8` | signed integer\n| `bX`                   | bit-sized integer (if `X` != 1)\n| `f4`, `f8`             | floating point number\n| no value<br>or `bytes` | byte array\n| `str`                  | string\n| `bool` (or `b1`)       | boolean\n| `struct`               | arbitrary KaitaiStruct-compatible user type\n| `io`                   | KaitaiStream-compatible IO stream\n| `any`                  | allow any type (if target language supports that)\n| other identifier       | user-defined type, without parameters<br>a nested type can be referenced with double colon (e.g. `type: 'foo::bar'`)\n\none can specify arrays by appending `[]` after the type identifier (e.g. `type: u2[]`, `type: 'foo::bar[]'`, `type: struct[]` etc.)",
+          "type": "string"
+        },
+        "doc": {
+          "$ref": "#/definitions/Doc"
+        },
+        "doc-ref": {
+          "$ref": "#/definitions/DocRef"
+        },
+        "enum": {
+          "description": "path to enum type, which will become the type of the parameter\n\nonly integer-based enums are supported, so `type` must be an integer type (`type: uX`, `type: sX` or `type: bX`, but not `type: b1` = boolean) for this property to work",
+          "type": "string",
+          "pattern": "^([a-z][a-z0-9_]*::)*[a-z][a-z0-9_]*$"
+        }
+      },
+      "patternProperties": {
+        "^-.*$": { "type": ["array", "boolean", "integer", "null", "number", "object", "string" ] }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "ParamsSpec": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ParamSpec"
+      }
+    },
+    "InstancesSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*$": {
+          "$ref": "#/definitions/Attribute"
+        }
+      }
+    },
+    "EnumValueSpec": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Identifier"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/Identifier"
+            },
+            "doc": {
+              "$ref": "#/definitions/Doc"
+            },
+            "doc-ref": {
+              "$ref": "#/definitions/DocRef"
+            },
+            "-orig-id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "patternProperties": {
+            "^-.*$": { "type": ["array", "boolean", "integer", "null", "number", "object", "string" ] }
+          }
+        }
+      ]
+    },
+    "EnumSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^.*$": {
+          "$ref": "#/definitions/EnumValueSpec"
+        }
+      }
+    },
+    "EnumsSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9_]*$": {
+          "$ref": "#/definitions/EnumSpec"
+        }
+      }
+    },
+    "Identifier": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    },
+    "AnyScalar": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

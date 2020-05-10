@@ -1,5 +1,5 @@
 
 pub mod raw;
-// pub mod loader;
+pub mod loader;
 // #[macro_use]
 // mod utils;

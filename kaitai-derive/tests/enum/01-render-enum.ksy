@@ -1,3 +1,7 @@
+meta:
+  id: png
+  file-extension: png
+  endian: be
 
 enums:
   color_type:

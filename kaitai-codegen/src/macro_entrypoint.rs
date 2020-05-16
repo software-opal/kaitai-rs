@@ -30,16 +30,20 @@ pub fn include_ksy(input: TokenStream) -> TokenStream {
         input_file
     };
 
-    kaitai_loader::loader::from_reader(File::open(&input_path).unwrap_or_else(|err| {
-        panic!("Unable to read `{}`: {}", input_path.to_string_lossy(), err)
-    }))
-    .unwrap_or_else(|err| {
-        panic!(
-            "Unable to parse `{}`: {}",
-            input_path.to_string_lossy(),
-            err
-        )
-    });
+    let ksy_struct =
+        kaitai_loader::loader::from_reader(File::open(&input_path).unwrap_or_else(|err| {
+            panic!("Unable to read `{}`: {}", input_path.to_string_lossy(), err)
+        }))
+        .unwrap_or_else(|err| {
+            panic!(
+                "Unable to parse `{}`: {}",
+                input_path.to_string_lossy(),
+                err
+            )
+        });
 
+    // let enums =
+    // crate::render::enums::render_enums(ksy_struct.enums)
     TokenStream::new()
+
 }

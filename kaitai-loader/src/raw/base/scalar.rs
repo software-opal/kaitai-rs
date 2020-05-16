@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[serde(untagged)]
 pub enum StringOrNumber {
     String(String),
-    Number(serde_json::Number),
+    Number(serde_yaml::Number),
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -19,7 +19,7 @@ pub enum StringOrBoolean {
 pub enum AnyNonNullScalar {
     String(String),
     Boolean(bool),
-    Number(serde_json::Number),
+    Number(serde_yaml::Number),
 }
 
 pub type AnyScalar = Option<AnyNonNullScalar>;

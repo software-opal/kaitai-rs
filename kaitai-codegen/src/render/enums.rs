@@ -34,7 +34,6 @@ pub fn ident_enum_spec<'a>(enum_name_and_items: &'a NamedEnumSpec<'a>) -> IdentE
 }
 pub fn render_enum(name: String, enum_spec: &EnumSpec) -> proc_macro2::TokenStream {
     let name_ident = string_to_ident(&enum_ident(&name));
-    eprintln!("{:#?} {:#?}", name, name_ident);
     let enum_name_and_items = named_enum_spec(enum_spec);
     let enum_ident_and_items = ident_enum_spec(&enum_name_and_items);
 
@@ -91,6 +90,7 @@ fn render_enum_block(name: &Ident, enum_ident_and_items: &IdentEnumSpec) -> Toke
         .collect();
 
     return quote! {
+        #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
         pub enum #name {
             #inner_tokens
         }
@@ -257,7 +257,8 @@ mod test_super {
             &ident_enum_spec(&named_enum_spec(&sample_enum())),
         );
         let expected = quote! {
-          pub  enum Test {
+            #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
+            pub enum Test {
                 Test1,
                 Test2,
             }

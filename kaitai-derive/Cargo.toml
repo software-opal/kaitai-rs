@@ -14,6 +14,7 @@ proc-macro2 = { version = "1", default-features = false }
 quote = "1.0"
 convert_case = "0.3.2"
 kaitai-codegen = { path = "../kaitai-codegen" }
+syn = "1.0"
 
 [dev-dependencies]
 trybuild = "1.0"

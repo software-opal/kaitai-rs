@@ -1,12 +1,11 @@
-extern crate proc_macro;
-use self::proc_macro::TokenStream;
+use proc_macro2::TokenStream;
 use std::fs::File;
 use std::path::PathBuf;
 
 use syn::parse::{Parse, ParseStream, Result};
-use syn::{parse_macro_input, LitStr};
+use syn::LitStr;
 
-struct IncludeKsyConfig {
+pub struct IncludeKsyConfig {
     file: String,
 }
 
@@ -19,10 +18,8 @@ impl Parse for IncludeKsyConfig {
     }
 }
 
-pub fn include_ksy(input: TokenStream) -> TokenStream {
-    let IncludeKsyConfig { file } = parse_macro_input!(input as IncludeKsyConfig);
-
-    let input_file = PathBuf::from(file);
+pub fn include_ksy(cfg: IncludeKsyConfig) -> TokenStream {
+    let input_file = PathBuf::from(cfg.file);
     let crate_root = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let input_path = if input_file.is_relative() {
         crate_root.join(input_file)
@@ -42,8 +39,5 @@ pub fn include_ksy(input: TokenStream) -> TokenStream {
             )
         });
 
-    // let enums =
-    // crate::render::enums::render_enums(ksy_struct.enums)
-    TokenStream::new()
-
+    crate::render::render_spec(ksy_struct, crate::render::Config::default()).into()
 }

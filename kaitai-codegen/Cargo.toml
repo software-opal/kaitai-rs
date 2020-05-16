@@ -11,7 +11,7 @@ proc-macro2 = { version = "1", default-features = false }
 quote = "1.0"
 convert_case = "0.3.2"
 kaitai-loader = { path = "../kaitai-loader" }
-syn = { version="1.0", features = ["full"] }
+syn = "1.0"
 
 [dev-dependencies]
 trybuild = "1.0"

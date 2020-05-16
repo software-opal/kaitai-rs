@@ -1,4 +1,3 @@
-
 /// used to give a more detailed description of a user-defined type. In most languages, it will be
 /// used as a docstring compatible with tools like Javadoc, Doxygen, JSDoc, etc.
 pub type Doc = String;

@@ -1,8 +1,8 @@
 use std::fmt;
 use std::marker::PhantomData;
 
+use serde::de::{self, MapAccess, Visitor};
 use serde::{Deserialize, Deserializer};
-use serde::de::{self, Visitor, MapAccess};
 
 // Taken from: https://serde.rs/string-or-struct.html
 pub fn string_or_struct<'de, T, D>(deserializer: D) -> Result<T, D::Error>
@@ -60,8 +60,7 @@ where
     // impl.
     struct StringOrPrimitive;
 
-    impl<'de> Visitor<'de> for StringOrPrimitive
-    {
+    impl<'de> Visitor<'de> for StringOrPrimitive {
         type Value = String;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -100,7 +99,7 @@ where
         }
     }
 
-    deserializer.deserialize_any(StringOrPrimitive{})
+    deserializer.deserialize_any(StringOrPrimitive {})
 }
 pub fn optional_primitive_as_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
 where
@@ -113,8 +112,7 @@ where
     // impl.
     struct StringOrPrimitive;
 
-    impl<'de> Visitor<'de> for StringOrPrimitive
-    {
+    impl<'de> Visitor<'de> for StringOrPrimitive {
         type Value = Option<String>;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -159,5 +157,5 @@ where
         }
     }
 
-    deserializer.deserialize_any(StringOrPrimitive{})
+    deserializer.deserialize_any(StringOrPrimitive {})
 }

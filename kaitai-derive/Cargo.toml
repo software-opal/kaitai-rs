@@ -1,19 +1,19 @@
 [package]
-name = "kaitai-rs"
+name = "kaitai-derive"
 version = "0.1.0"
 authors = ["Opal Symes <code@opal.codes>"]
 edition = "2018"
 
-[workspace]
-members = ["kaitai-loader", "kaitai-derive", "kaitai-codegen"]
+[lib]
+proc-macro = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 proc-macro2 = { version = "1", default-features = false }
 quote = "1.0"
-kaitai-loader = { path = "kaitai-loader" }
+convert_case = "0.3.2"
+kaitai-codegen = { path = "../kaitai-codegen" }
 
-
-# [patch.crates-io]
-# schemafy = { git = 'https://github.com/software-opal/schemafy' }
+[dev-dependencies]
+trybuild = "1.0"

@@ -45,13 +45,13 @@ impl From<EnumValueSpecIntermediate> for EnumValueSpec {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 #[serde(from = "EnumValueSpecIntermediate")]
 pub struct EnumValueSpec {
-    id: Identifier,
+    pub id: Identifier,
     #[serde(default)]
-    doc: Option<Doc>,
+    pub doc: Option<Doc>,
     #[serde(default, rename = "doc-ref")]
-    doc_ref: Option<DocRef>,
+    pub doc_ref: Option<DocRef>,
     #[serde(default, rename = "-orig-id")]
-    orig_id: Option<String>,
+    pub orig_id: Option<String>,
 }
 
 pub type EnumSpec = BTreeMap<String, EnumValueSpec>;

@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::raw::base::{Doc, DocRef, Identifier};
 
-
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct ParamSpec {
     pub doc: Option<Doc>,

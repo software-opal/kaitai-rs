@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::raw::base::{Doc, DocRef, Identifier, Switch};
-use crate::raw::serde_util::{primitive_as_string, optional_primitive_as_string};
-
+use crate::raw::serde_util::{optional_primitive_as_string, primitive_as_string};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
@@ -24,53 +23,56 @@ pub enum AttributeType {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(tag = "repeat", rename_all="lowercase")]
+#[serde(tag = "repeat", rename_all = "lowercase")]
 pub enum AttributeRepeat {
     EOS,
     Expr {
-        #[serde(rename="repeat-expr", deserialize_with="primitive_as_string")]
+        #[serde(rename = "repeat-expr", deserialize_with = "primitive_as_string")]
         expression: String,
     },
     Until {
-        #[serde(rename="repeat-expr", deserialize_with="primitive_as_string")]
-        expression: String
-    }
-
+        #[serde(rename = "repeat-expr", deserialize_with = "primitive_as_string")]
+        expression: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct Attribute {
-    pub id: Identifier,
+    pub id: Option<Identifier>,
     #[serde(default)]
-    doc: Option<Doc>,
+    pub doc: Option<Doc>,
     #[serde(default, rename = "doc-ref")]
-    doc_ref: Option<DocRef>,
+    pub doc_ref: Option<DocRef>,
     #[serde(default)]
-    contents: Option<ContentsType>,
-    #[serde(default, rename="type")]
-    type_: Option<AttributeType>,
+    pub contents: Option<ContentsType>,
+    #[serde(default, rename = "type")]
+    pub type_: Option<AttributeType>,
     #[serde(default, flatten)]
-    repeat: Option<AttributeRepeat>,
-    #[serde(default, rename="if", deserialize_with="optional_primitive_as_string")]
-    if_: Option<String>,
-    #[serde(default, deserialize_with="optional_primitive_as_string")]
-    size: Option<String>,
+    pub repeat: Option<AttributeRepeat>,
+    #[serde(
+        default,
+        rename = "if",
+        deserialize_with = "optional_primitive_as_string"
+    )]
+    pub if_: Option<String>,
+    #[serde(default, deserialize_with = "optional_primitive_as_string")]
+    pub size: Option<String>,
     #[serde(default, rename = "size-eos")]
-    size_eos: Option<bool>,
+    pub size_eos: Option<bool>,
     // process
     #[serde(default, rename = "enum")]
-    enum_: Option<String>,
+    pub enum_: Option<String>,
     #[serde(default)]
-    encoding: Option<String>,
+    pub encoding: Option<String>,
     // pad-right
     #[serde(default)]
-    terminator: Option<u8>,
+    pub terminator: Option<u8>,
     #[serde(default)]
-    consume: Option<bool>,
+    pub consume: Option<bool>,
     #[serde(default)]
-    include: Option<bool>,
+    pub include: Option<bool>,
     #[serde(default, rename = "eos-error")]
-    eos_error: Option<bool>,
+    pub eos_error: Option<bool>,
     //pos
     //io
     //value

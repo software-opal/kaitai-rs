@@ -1,25 +1,33 @@
+use crate::raw::attrs::Attributes;
+use crate::raw::types::TypesSpec;
 use serde::{Deserialize, Serialize};
 
 use super::{
     base::{Doc, DocRef},
     enums::EnumsSpec,
     meta::RootMetaSpec,
-    params::ParamsSpec
+    params::ParamsSpec,
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
+#[serde(deny_unknown_fields)]
 pub struct KsySpec {
-    meta: RootMetaSpec,
+    pub meta: RootMetaSpec,
     #[serde(default)]
-    doc: Option<Doc>,
+    pub doc: Option<Doc>,
     #[serde(default, rename = "doc-ref")]
-    doc_ref: Option<DocRef>,
+    pub doc_ref: Option<DocRef>,
     #[serde(default)]
-    params: ParamsSpec,
+    pub params: ParamsSpec,
+    #[serde(default)]
+    pub seq: Attributes,
+    #[serde(default)]
+    pub types: TypesSpec,
     ///"allows for the setup of named enums, mappings of integer constants to symbolic names. Can be used with integer attributes using the enum key.
     ///
     /// Would be represented as enum-like construct (or closest equivalent, if target language doesn’t support enums), nested or namespaced in current type/class
-    enums: EnumsSpec,
+    #[serde(default)]
+    pub enums: EnumsSpec,
 }
 
 // "properties": {

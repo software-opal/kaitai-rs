@@ -13,14 +13,21 @@ use crate::raw::{
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct TypeSpec {
+    #[serde(default)]
     pub doc: Option<Doc>,
     #[serde(rename = "doc-ref")]
     pub doc_ref: Option<DocRef>,
+    #[serde(default)]
     pub enums: EnumsSpec,
-    pub instances: Option<InstancesSpec>,
+    #[serde(default)]
+    pub instances: InstancesSpec,
+    #[serde(default)]
     pub meta: Option<TypeMetaSpec>,
+    #[serde(default)]
     pub params: ParamsSpec,
-    pub seq: Option<Attributes>,
+    #[serde(default)]
+    pub seq: Attributes,
+    #[serde(default)]
     pub types: TypesSpec,
 }
 

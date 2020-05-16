@@ -1,11 +1,6 @@
+// struct KaitaiOptions {}
 
-
-struct KaitaiOptions {
-
-}
-
-
-struct KaitaiBuilder {
-    options: KaitaiOptions,
-    main_struct: RootTypeSpec
-}
+// struct KaitaiBuilder {
+//     options: KaitaiOptions,
+//     // main_struct: RootTypeSpec
+// }

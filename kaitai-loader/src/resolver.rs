@@ -87,4 +87,27 @@ impl<'a> ResolvedKsySpec<'a> {
             .map(|(key, &value)| (self.enum_name_mapping[key].clone(), value))
             .collect()
     }
+
+    pub fn all_types(&self) -> BTreeMap<String, &'a TypeSpec> {
+        self.types
+            .iter()
+            .map(|(key, &value)| (self.type_name_mapping[key].clone(), value))
+            .collect()
+    }
+
+    pub fn find_type_named(
+        &'a self,
+        type_name: String,
+    ) -> Option<(String, &Vec<&'a String>, &TypeSpec)> {
+        self.types
+            .iter()
+            .filter_map(|(key, &value)| {
+                if key.last() == Some(&&type_name) {
+                    Some((self.type_name_mapping[key].clone(), key, value))
+                } else {
+                    None
+                }
+            })
+            .next()
+    }
 }

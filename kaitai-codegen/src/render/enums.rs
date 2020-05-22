@@ -10,9 +10,6 @@ use std::str::FromStr;
 pub fn map_enum_name(_key: &str, spec: &EnumValueSpec) -> String {
     spec.id.to_case(Case::UpperCamel)
 }
-pub fn enum_ident(name: &str) -> String {
-    name.to_case(Case::UpperCamel)
-}
 pub fn string_to_ident(name: &str) -> Ident {
     Ident::new(name, Span::call_site())
 }
@@ -33,7 +30,7 @@ pub fn ident_enum_spec<'a>(enum_name_and_items: &'a NamedEnumSpec<'a>) -> IdentE
         .collect()
 }
 pub fn render_enum(name: String, enum_spec: &EnumSpec) -> proc_macro2::TokenStream {
-    let name_ident = string_to_ident(&enum_ident(&name));
+    let name_ident = string_to_ident(&name);
     let enum_name_and_items = named_enum_spec(enum_spec);
     let enum_ident_and_items = ident_enum_spec(&enum_name_and_items);
 

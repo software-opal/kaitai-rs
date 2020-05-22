@@ -1,5 +1,23 @@
 
-kaitai_derive::include_ksy!("../../../kaitai-derive/tests/enum/01-render-enum.ksy");
+kaitai_derive::codegen_ksy!(
+r#"
+meta:
+    id: png
+    file-extension: png
+    endian: be
+
+enums:
+    color_type:
+        0: greyscale
+        2: truecolor
+        3: indexed
+        4: greyscale_alpha
+        6: truecolor_alpha
+    phys_unit:
+        0: unknown
+        1: meter
+"#
+);
 
 fn main() {
     use std::convert::TryFrom;

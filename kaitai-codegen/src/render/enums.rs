@@ -14,13 +14,13 @@ pub fn string_to_ident(name: &str) -> Ident {
     Ident::new(name, Span::call_site())
 }
 
-pub type NamedEnumSpec<'a> = BTreeMap<&'a String, (String, &'a EnumValueSpec)>;
-pub type IdentEnumSpec<'a> = BTreeMap<&'a String, (Ident, &'a EnumValueSpec)>;
+pub type NamedEnumSpec<'a> = BTreeMap<&'a str, (String, &'a EnumValueSpec)>;
+pub type IdentEnumSpec<'a> = BTreeMap<&'a str, (Ident, &'a EnumValueSpec)>;
 
 pub fn named_enum_spec(enum_spec: &EnumSpec) -> NamedEnumSpec<'_> {
     enum_spec
         .iter()
-        .map(|(key, value)| (key, (map_enum_name(key, value), value)))
+        .map(|(key, value)| (&key[..], (map_enum_name(key, value), value)))
         .collect::<BTreeMap<_, _>>()
 }
 pub fn ident_enum_spec<'a>(enum_name_and_items: &'a NamedEnumSpec<'a>) -> IdentEnumSpec<'a> {
@@ -172,7 +172,7 @@ mod test_super {
             named_enum_spec(&sample_enum()),
             vec![
                 (
-                    &"1".to_owned(),
+                    "1",
                     (
                         "Test1".to_owned(),
                         &EnumValueSpec {
@@ -182,7 +182,7 @@ mod test_super {
                     )
                 ),
                 (
-                    &"2".to_owned(),
+                    "2",
                     (
                         "Test2".to_owned(),
                         &EnumValueSpec {
@@ -192,7 +192,7 @@ mod test_super {
                     )
                 ),
                 (
-                    &"foo".to_owned(),
+                    "foo",
                     (
                         "Test2".to_owned(),
                         &EnumValueSpec {
@@ -212,7 +212,7 @@ mod test_super {
             ident_enum_spec(&named_enum_spec(&sample_enum())),
             vec![
                 (
-                    &"1".to_owned(),
+                    "1",
                     (
                         Ident::new(&"Test1", Span::call_site()),
                         &EnumValueSpec {
@@ -222,7 +222,7 @@ mod test_super {
                     )
                 ),
                 (
-                    &"2".to_owned(),
+                    "2",
                     (
                         Ident::new(&"Test2", Span::call_site()),
                         &EnumValueSpec {
@@ -232,7 +232,7 @@ mod test_super {
                     )
                 ),
                 (
-                    &"foo".to_owned(),
+                    "foo",
                     (
                         Ident::new(&"Test2", Span::call_site()),
                         &EnumValueSpec {

@@ -8,12 +8,23 @@ use syn::LitStr;
 pub struct IncludeKsyConfig {
     file: String,
 }
+pub struct CodegenKsyConfig {
+    content: String,
+}
 
 impl Parse for IncludeKsyConfig {
     fn parse(input: ParseStream) -> Result<Self> {
         let input_file: LitStr = input.parse()?;
-        Ok(IncludeKsyConfig {
+        Ok(Self {
             file: input_file.value(),
+        })
+    }
+}
+impl Parse for CodegenKsyConfig {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content: LitStr = input.parse()?;
+        Ok(Self {
+            content: content.value(),
         })
     }
 }
@@ -39,5 +50,12 @@ pub fn include_ksy(cfg: IncludeKsyConfig) -> TokenStream {
             )
         });
 
-    crate::render::render_spec(ksy_struct, crate::render::Config::default()).into()
+    crate::render::render_spec(ksy_struct, crate::render::Config::default())
+}
+
+pub fn codegen_ksy(cfg: CodegenKsyConfig) -> TokenStream {
+    let ksy_struct = kaitai_loader::loader::from_string(cfg.content)
+        .unwrap_or_else(|err| panic!("Unable to parse: {}", err));
+
+    crate::render::render_spec(ksy_struct, crate::render::Config::default())
 }

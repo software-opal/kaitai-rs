@@ -9,10 +9,12 @@ pub fn include_ksy(input: TokenStream) -> TokenStream {
         input as kaitai_codegen::macro_entrypoint::IncludeKsyConfig
     )))
 }
-// #[proc_macro]
-// pub fn codegen_ksy(input: TokenStream) -> TokenStream {
-//     kaitai_codegen::codegen_ksy(input)
-// }
+#[proc_macro]
+pub fn codegen_ksy(input: TokenStream) -> TokenStream {
+    TokenStream::from(kaitai_codegen::codegen_ksy(parse_macro_input!(
+        input as kaitai_codegen::macro_entrypoint::CodegenKsyConfig
+    )))
+}
 
 #[cfg(test)]
 mod tests {

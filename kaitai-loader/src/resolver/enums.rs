@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum EnumPathSegment<'a> {
-    Type(&'a String),
-    Enum(&'a String),
+    Type(&'a str),
+    Enum(&'a str),
 }
 
 pub fn extract_enums<'a>(spec: &'a KsySpec) -> BTreeMap<Vec<EnumPathSegment<'a>>, &'a EnumSpec> {

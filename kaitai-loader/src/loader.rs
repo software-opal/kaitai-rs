@@ -132,11 +132,11 @@ mod test_generate {
                                 type_: Some(AttributeType::Switch(Switch {
                                     switch_on: Some(AnyNonNullScalar::String("_root.ihdr.color_type".to_owned())),
                                     cases: map!{
-                                        "color_type::greyscale".to_owned() => Some(AnyNonNullScalar::String("bkgd_greyscale".to_owned())),
-                                        "color_type::greyscale_alpha".to_owned() => Some(AnyNonNullScalar::String("bkgd_greyscale".to_owned())),
-                                        "color_type::indexed".to_owned() => Some(AnyNonNullScalar::String("bkgd_indexed".to_owned())),
-                                        "color_type::truecolor".to_owned() => Some(AnyNonNullScalar::String("bkgd_truecolor".to_owned())),
-                                        "color_type::truecolor_alpha".to_owned() => Some(AnyNonNullScalar::String("bkgd_truecolor".to_owned()))
+                                        "color_type::greyscale".to_owned() => ("bkgd_greyscale".to_owned()),
+                                        "color_type::greyscale_alpha".to_owned() => ("bkgd_greyscale".to_owned()),
+                                        "color_type::indexed".to_owned() => ("bkgd_indexed".to_owned()),
+                                        "color_type::truecolor".to_owned() => ("bkgd_truecolor".to_owned()),
+                                        "color_type::truecolor_alpha".to_owned() => ("bkgd_truecolor".to_owned())
                                     }
                                 })),
                                 ..Attribute::default()
@@ -227,16 +227,16 @@ mod test_generate {
                                 type_: Some(AttributeType::Switch(Switch {
                                     switch_on: Some(AnyNonNullScalar::String("type".to_owned())),
                                     cases: map!{
-                                        "\"PLTE\"".to_owned() => Some(AnyNonNullScalar::String("plte_chunk".to_owned())),
-                                        "\"bKGD\"".to_owned() => Some(AnyNonNullScalar::String("bkgd_chunk".to_owned())),
-                                        "\"cHRM\"".to_owned() => Some(AnyNonNullScalar::String("chrm_chunk".to_owned())),
-                                        "\"gAMA\"".to_owned() => Some(AnyNonNullScalar::String("gama_chunk".to_owned())),
-                                        "\"iTXt\"".to_owned() => Some(AnyNonNullScalar::String("international_text_chunk".to_owned())),
-                                        "\"pHYs\"".to_owned() => Some(AnyNonNullScalar::String("phys_chunk".to_owned())),
-                                        "\"sRGB\"".to_owned() => Some(AnyNonNullScalar::String("srgb_chunk".to_owned())),
-                                        "\"tEXt\"".to_owned() => Some(AnyNonNullScalar::String("text_chunk".to_owned())),
-                                        "\"tIME\"".to_owned() => Some(AnyNonNullScalar::String("time_chunk".to_owned())),
-                                        "\"zTXt\"".to_owned() => Some(AnyNonNullScalar::String("compressed_text_chunk".to_owned()))
+                                        "\"PLTE\"".to_owned() => (("plte_chunk".to_owned())),
+                                        "\"bKGD\"".to_owned() => (("bkgd_chunk".to_owned())),
+                                        "\"cHRM\"".to_owned() => (("chrm_chunk".to_owned())),
+                                        "\"gAMA\"".to_owned() => (("gama_chunk".to_owned())),
+                                        "\"iTXt\"".to_owned() => (("international_text_chunk".to_owned())),
+                                        "\"pHYs\"".to_owned() => (("phys_chunk".to_owned())),
+                                        "\"sRGB\"".to_owned() => (("srgb_chunk".to_owned())),
+                                        "\"tEXt\"".to_owned() => (("text_chunk".to_owned())),
+                                        "\"tIME\"".to_owned() => (("time_chunk".to_owned())),
+                                        "\"zTXt\"".to_owned() => (("compressed_text_chunk".to_owned()))
                                     }
                                 })),
                                 size: Some("len".to_owned()),

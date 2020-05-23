@@ -8,5 +8,5 @@ use super::scalar::AnyScalar;
 pub struct Switch {
     #[serde(rename = "switch-on")]
     pub switch_on: AnyScalar,
-    pub cases: BTreeMap<String, AnyScalar>,
+    pub cases: BTreeMap<String, String>,
 }

@@ -86,12 +86,7 @@ mod test {
                 .unwrap(),
             Endian::Switch(Switch {
                 switch_on: Some(AnyNonNullScalar::String("a".to_owned())),
-                cases: vec![(
-                    "a".to_owned(),
-                    Some(AnyNonNullScalar::String("b".to_owned()))
-                )]
-                .into_iter()
-                .collect()
+                cases: vec![("a".to_owned(), "b".to_owned())].into_iter().collect()
             })
         );
     }
@@ -105,12 +100,7 @@ mod test {
         assert_eq!(
             serde_json::to_string(&Endian::Switch(Switch {
                 switch_on: Some(AnyNonNullScalar::String("a".to_owned())),
-                cases: vec![(
-                    "a".to_owned(),
-                    Some(AnyNonNullScalar::String("b".to_owned()))
-                )]
-                .into_iter()
-                .collect()
+                cases: vec![("a".to_owned(), "b".to_owned())].into_iter().collect()
             }))
             .unwrap(),
             r#"{"switch-on":"a","cases":{"a":"b"}}"#

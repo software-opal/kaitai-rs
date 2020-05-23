@@ -22,7 +22,7 @@ pub enum AttributeType {
     Switch(Switch),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(tag = "repeat", rename_all = "lowercase")]
 pub enum AttributeRepeat {
     EOS,

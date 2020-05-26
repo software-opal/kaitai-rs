@@ -1,7 +1,7 @@
-use crate::raw::enums::EnumSpec;
-use crate::raw::root::KsySpec;
-use crate::raw::types::TypeSpec;
-use crate::resolver::utils::prefix_map;
+use crate::{
+    raw::{enums::EnumSpec, root::KsySpec, types::TypeSpec},
+    resolver::utils::prefix_map,
+};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

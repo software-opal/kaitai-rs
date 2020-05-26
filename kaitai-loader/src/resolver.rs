@@ -2,10 +2,10 @@ use std::collections::BTreeMap;
 
 use convert_case::{Case, Casing};
 
-use crate::raw::enums::EnumSpec;
-use crate::raw::root::KsySpec;
-use crate::raw::types::TypeSpec;
-use crate::resolver::enums::EnumPathSegment;
+use crate::{
+    raw::{enums::EnumSpec, root::KsySpec, types::TypeSpec},
+    resolver::enums::EnumPathSegment,
+};
 
 pub mod attrs;
 pub mod enums;
@@ -110,7 +110,10 @@ impl<'a> ResolvedKsySpec<'a> {
             .next()
     }
 
-    pub fn find_enum_named(&'a self, enum_name: &str) -> Option<(String, &[EnumPathSegment], &EnumSpec)> {
+    pub fn find_enum_named(
+        &'a self,
+        enum_name: &str,
+    ) -> Option<(String, &[EnumPathSegment], &EnumSpec)> {
         self.enums
             .iter()
             .filter_map(|(key, &value)| {

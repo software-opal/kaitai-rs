@@ -5,7 +5,7 @@ authors = ["Opal Symes <code@opal.codes>"]
 edition = "2018"
 
 [workspace]
-members = ["kaitai-loader", "kaitai-derive", "kaitai-codegen"]
+members = ["kaitai-loader", "kaitai-derive", "kaitai-codegen", "kaitai-expr-lang"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

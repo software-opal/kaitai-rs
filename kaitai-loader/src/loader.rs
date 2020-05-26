@@ -14,16 +14,13 @@ where
 #[cfg(test)]
 mod test_generate {
     use super::*;
-    use crate::raw::attrs::{
-        Attribute, AttributeRepeat, AttributeType, ContentsType, StringOrByte,
+    use crate::raw::{
+        attrs::{Attribute, AttributeRepeat, AttributeType, ContentsType, StringOrByte},
+        base::{endian::Endian, scalar::AnyNonNullScalar, switch::Switch},
+        enums::EnumValueSpec,
+        meta::{CommonMetaSpec, RootMetaSpec},
+        types::TypeSpec,
     };
-    use crate::raw::base::endian::Endian;
-    use crate::raw::base::scalar::AnyNonNullScalar;
-    use crate::raw::base::switch::Switch;
-    use crate::raw::enums::EnumValueSpec;
-    use crate::raw::meta::CommonMetaSpec;
-    use crate::raw::meta::RootMetaSpec;
-    use crate::raw::types::TypeSpec;
     use difference::{Changeset, Difference};
     use std::collections::BTreeMap;
 

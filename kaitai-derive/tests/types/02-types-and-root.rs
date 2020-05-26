@@ -7,6 +7,11 @@ meta:
     ks-version: 0.8
     encoding: UTF-8
     endian: be
+seq:
+    - id: something
+      type: u16
+      repeat: expr
+      repeat-expr: 10
 types:
     record:
       seq:
@@ -29,6 +34,8 @@ types:
 );
 
 fn main() {
+
+    use std::convert::TryFrom;
 
     let value: RecordValue = RecordValue::long(10_u32);
     // Assert that RecordValue has exactly the following variants, and the inner types are correct.
@@ -55,5 +62,9 @@ fn main() {
         filename: "".to_owned(),
         data_type: "".to_owned(),
         value: RecordValue::long(10_u32),
+    };
+
+    let _ds_store = DsStore {
+        something: vec![0_u16]
     };
 }

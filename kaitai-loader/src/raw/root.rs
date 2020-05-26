@@ -1,5 +1,4 @@
-use crate::raw::attrs::Attributes;
-use crate::raw::types::TypesSpec;
+use crate::raw::{attrs::Attributes, types::TypesSpec};
 use serde::{Deserialize, Serialize};
 
 use super::{

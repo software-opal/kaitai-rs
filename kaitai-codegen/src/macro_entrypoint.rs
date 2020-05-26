@@ -1,9 +1,10 @@
 use proc_macro2::TokenStream;
-use std::fs::File;
-use std::path::PathBuf;
+use std::{fs::File, path::PathBuf};
 
-use syn::parse::{Parse, ParseStream, Result};
-use syn::LitStr;
+use syn::{
+    parse::{Parse, ParseStream, Result},
+    LitStr,
+};
 
 pub struct IncludeKsyConfig {
     file: String,

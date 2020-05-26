@@ -1,17 +1,15 @@
 use convert_case::{Case, Casing};
-use kaitai_loader::raw::enums::EnumSpec;
-use kaitai_loader::raw::enums::EnumValueSpec;
-use proc_macro2::{Ident, Span, TokenStream};
-use quote::quote;
-use quote::ToTokens;
-use std::collections::BTreeMap;
-use std::str::FromStr;
+use kaitai_loader::raw::enums::{EnumSpec, EnumValueSpec};
+use proc_macro2::{Ident, TokenStream};
+use quote::{quote, ToTokens};
+use std::{collections::BTreeMap, str::FromStr};
+use crate::utils;
 
 pub fn map_enum_name(_key: &str, spec: &EnumValueSpec) -> String {
     spec.id.to_case(Case::UpperCamel)
 }
 pub fn string_to_ident(name: &str) -> Ident {
-    Ident::new(name, Span::call_site())
+    utils::ident(name)
 }
 
 pub type NamedEnumSpec<'a> = BTreeMap<&'a str, (String, &'a EnumValueSpec)>;
@@ -214,7 +212,7 @@ mod test_super {
                 (
                     "1",
                     (
-                        Ident::new(&"Test1", Span::call_site()),
+                        utils::ident(&"Test1"),
                         &EnumValueSpec {
                             id: "test1".to_owned(),
                             ..EnumValueSpec::default()
@@ -224,7 +222,7 @@ mod test_super {
                 (
                     "2",
                     (
-                        Ident::new(&"Test2", Span::call_site()),
+                        utils::ident(&"Test2"),
                         &EnumValueSpec {
                             id: "test2".to_owned(),
                             ..EnumValueSpec::default()
@@ -234,7 +232,7 @@ mod test_super {
                 (
                     "foo",
                     (
-                        Ident::new(&"Test2", Span::call_site()),
+                        utils::ident(&"Test2"),
                         &EnumValueSpec {
                             id: "test2".to_owned(),
                             ..EnumValueSpec::default()
@@ -250,7 +248,7 @@ mod test_super {
     #[test]
     fn test_render_enum() {
         let render = render_enum_block(
-            &Ident::new("Test", Span::call_site()),
+            &utils::ident("Test"),
             &ident_enum_spec(&named_enum_spec(&sample_enum())),
         );
         let expected = quote! {
@@ -265,7 +263,7 @@ mod test_super {
     #[test]
     fn test_render_enum_try_from_str() {
         let render = render_try_from_block(
-            &Ident::new("Test", Span::call_site()),
+            &utils::ident("Test"),
             &ident_enum_spec(&named_enum_spec(&sample_enum())),
             quote! { &str },
             |s| Some(s.to_owned()),
@@ -292,7 +290,7 @@ mod test_super {
     #[test]
     fn test_render_enum_try_from_u8() {
         let render = render_try_from_block(
-            &Ident::new("Test", Span::call_site()),
+            &utils::ident("Test"),
             &ident_enum_spec(&named_enum_spec(&sample_enum())),
             quote! { u8 },
             |s: &str| u8::from_str(s).ok(),

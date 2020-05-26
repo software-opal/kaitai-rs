@@ -1,11 +1,16 @@
+use crate::utils;
 use convert_case::{Case, Casing};
-use kaitai_loader::raw::attrs::Attribute;
-use kaitai_loader::raw::types::TypeSpec;
-use kaitai_loader::resolver::{
-    attrs::{get_attr_type, BaseAttributeType, ResolvedAttributeType},
-    ResolvedKsySpec,
+use kaitai_loader::{
+    raw::{attrs::Attribute, types::TypeSpec},
+    resolver::{
+        attrs::{
+            get_attr_type, BaseAttributeType, FloatAttributeType, IntegerAttributeType,
+            ResolvedAttributeType,
+        },
+        ResolvedKsySpec,
+    },
 };
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::BTreeMap;
 
@@ -15,39 +20,67 @@ pub fn attribute_enum_name(type_name: &str, attr_name: &str) -> String {
 
 const DEFAULT_ATTRIBUTE_NAME: &str = "unknown";
 
+pub fn int_type_to_tokens(int: &IntegerAttributeType) -> TokenStream {
+    match int {
+        IntegerAttributeType::U8 => quote! {u8},
+        IntegerAttributeType::U16 => quote! {u16},
+        IntegerAttributeType::U32 => quote! {u32},
+        IntegerAttributeType::U64 => quote! {u64},
+        IntegerAttributeType::I8 => quote! {i8},
+        IntegerAttributeType::I16 => quote! {i16},
+        IntegerAttributeType::I32 => quote! {i32},
+        IntegerAttributeType::I64 => quote! {i64},
+    }
+}
+
 pub fn base_type_to_tokens(
-    type_name: &str, attr_name: &str,
+    type_name: &str,
+    attr_name: &str,
     attr_type: &BaseAttributeType,
     resolved: &ResolvedKsySpec,
 ) -> Result<TokenStream, String> {
     match attr_type {
-        BaseAttributeType::Integer(int) => match int {
-            kaitai_loader::resolver::attrs::IntegerAttributeType::U8 => Ok(quote! {u8}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::U16 => Ok(quote! {u16}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::U32 => Ok(quote! {u32}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::U64 => Ok(quote! {u64}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::I8 => Ok(quote! {i8}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::I16 => Ok(quote! {i16}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::I32 => Ok(quote! {i32}),
-            kaitai_loader::resolver::attrs::IntegerAttributeType::I64 => Ok(quote! {i64}),
-        },
+        BaseAttributeType::Integer(int) => Ok(int_type_to_tokens(int)),
         BaseAttributeType::Float(float) => match float {
-            kaitai_loader::resolver::attrs::FloatAttributeType::F32 => Ok(quote! {f32}),
-            kaitai_loader::resolver::attrs::FloatAttributeType::F64 => Ok(quote! {f64}),
+            FloatAttributeType::F32 => Ok(quote! {f32}),
+            FloatAttributeType::F64 => Ok(quote! {f64}),
         },
-        BaseAttributeType::String { .. } => Ok(quote! {String}),
-        BaseAttributeType::Stringz { .. } => Ok(quote! {String}),
+        BaseAttributeType::String => Ok(quote! {String}),
         BaseAttributeType::Switch(_) => {
-            let ident = Ident::new(&attribute_enum_name(type_name, attr_name), Span::call_site());
-          Ok(quote! {#ident} )},
-        BaseAttributeType::Enum(_, name) => resolved.find_enum_named(name).ok_or_else(|| format!("Unable to find type for enum: {:?}", name))
-        .map(|(name, _, _)| Ident::new(&name, Span::call_site()))
-        .map(|ident| quote! {#ident}),
+            let ident = utils::ident(&attribute_enum_name(type_name, attr_name));
+            Ok(quote! {#ident})
+        }
+        BaseAttributeType::Enum(_, name) => resolved
+            .find_enum_named(name)
+            .ok_or_else(|| format!("Unable to find type for enum: {:?}", name))
+            .map(|(name, _, _)| utils::ident(&name))
+            .map(|ident| quote! {#ident}),
         BaseAttributeType::User(name) => resolved
             .find_type_named(name)
             .ok_or_else(|| format!("Unable to find type for user type: {:?}", name))
-            .map(|(name, _, _)| Ident::new(&name, Span::call_site()))
+            .map(|(name, _, _)| utils::ident(&name))
             .map(|ident| quote! {#ident}),
+    }
+}
+
+pub fn resolved_type_to_tokens(
+    type_name: &str,
+    attr_name: &str,
+    attr_type: &ResolvedAttributeType,
+    resolved: &ResolvedKsySpec,
+) -> Result<TokenStream, String> {
+    match attr_type {
+        ResolvedAttributeType::Base(atype) => {
+            base_type_to_tokens(type_name, attr_name, atype, resolved)
+        }
+        ResolvedAttributeType::Repeat(_, rtype) => {
+            let inner = base_type_to_tokens(type_name, attr_name, rtype, resolved)?;
+            Ok(quote! {Vec<#inner>})
+        }
+        ResolvedAttributeType::Optional(otype) => {
+            let inner = base_type_to_tokens(type_name, attr_name, otype, resolved)?;
+            Ok(quote! {Option<#inner>})
+        }
     }
 }
 
@@ -94,6 +127,7 @@ pub fn resolve_attr_names(
 // }
 
 pub fn render_type(name: String, spec: &TypeSpec, resolved: &ResolvedKsySpec) -> TokenStream {
+    let struct_name = utils::ident(&name);
     let attr_names = resolve_attr_names(&spec.seq).unwrap();
 
     let attr_enums = attr_names
@@ -101,12 +135,25 @@ pub fn render_type(name: String, spec: &TypeSpec, resolved: &ResolvedKsySpec) ->
         .map(|(attr_name, _attr, attr_type)| attribute_enum(&name, attr_name, attr_type, resolved))
         .collect::<Result<Vec<_>, _>>()
         .unwrap();
-    let struct_items = attr_names.iter().map(|(attr_name, attr| {
+    let struct_items = attr_names
+        .iter()
+        .map(|(attr_name, _attr, attr_type)| {
+            let type_name = resolved_type_to_tokens(&name, attr_name, attr_type, resolved)?;
+            let attr_name = utils::ident(attr_name);
+            Ok(quote! {
+                pub #attr_name: #type_name,
+            })
+        })
+        .collect::<Result<Vec<_>, String>>()
+        .unwrap();
 
-    })
     // for (_attr_name, _attr) in attr_names {}
 
     quote! {
+        #[derive(Clone, Debug, PartialEq, PartialOrd)]
+        pub struct #struct_name {
+            #(#struct_items)*
+        }
         #(#attr_enums)*
     }
 }
@@ -119,23 +166,28 @@ pub fn attribute_enum(
 ) -> Result<TokenStream, String> {
     match attr_type.switch_type() {
         Some(switch_arms) => {
-            let enum_name = Ident::new(
-                &attribute_enum_name(type_name, attr_name),
-                Span::call_site(),
-            );
-            let variants = switch_arms.iter().map(|(case, resolved_type)| {
-                let case_name = Ident::new(
-                    case.trim_end_matches('"').trim_start_matches('"'),
-                    Span::call_site(),
-                );
-                let res_type_name = base_type_to_tokens(resolved_type, resolved).ok_or_else(|| format!("Unable to determine type of switch arm, possibly an unrecognised user defined type. Got: {:?}", resolved_type))?;
-                return Ok(quote! {
-                    #case_name(#res_type_name)
-                });
-            }).collect::<Result<Vec<_>, String>>()?;
+            let enum_name = utils::ident(&attribute_enum_name(type_name, attr_name));
+            let variants = switch_arms
+                .iter()
+                .map(|(case, resolved_type)| {
+                    let case_name =
+                        utils::ident(case.trim_end_matches('"').trim_start_matches('"'));
+                    let res_type_name =
+                        base_type_to_tokens(type_name, attr_name, resolved_type, resolved)
+                            .map_err(|err| {
+                                format!(
+                                    "Unable to determine type of switch arm case {:?}: {}",
+                                    case, err
+                                )
+                            })?;
+                    return Ok(quote! {
+                        #case_name(#res_type_name)
+                    });
+                })
+                .collect::<Result<Vec<_>, String>>()?;
             // Cannot derive Eq and Ord as floats don't implement them.
             Ok(quote! {
-                #[derive(Debug, PartialEq, PartialOrd)]
+                #[derive(Clone, Debug, PartialEq, PartialOrd)]
                 pub enum #enum_name {
                     #(#variants),*
                 }

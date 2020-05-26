@@ -1,8 +1,9 @@
 use std::collections::BTreeMap;
 
-use crate::raw::root::KsySpec;
-use crate::raw::types::TypeSpec;
-use crate::resolver::utils::prefix_map;
+use crate::{
+    raw::{root::KsySpec, types::TypeSpec},
+    resolver::utils::prefix_map,
+};
 
 pub fn extract_types<'a>(spec: &'a KsySpec) -> BTreeMap<Vec<&'a str>, &'a TypeSpec> {
     let mut map = BTreeMap::new();

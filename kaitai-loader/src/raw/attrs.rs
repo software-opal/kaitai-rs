@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::raw::base::{Doc, DocRef, Identifier, Switch};
-use crate::raw::serde_util::{optional_primitive_as_string, primitive_as_string};
+use crate::raw::{
+    base::{Doc, DocRef, Identifier, Switch},
+    serde_util::{optional_primitive_as_string, primitive_as_string},
+};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]

@@ -4,10 +4,12 @@ pub mod endian;
 pub mod scalar;
 pub mod switch;
 
-pub use self::doc::{Doc, DocRef};
-pub use self::endian::Endian;
-pub use self::scalar::{AnyNonNullScalar, AnyScalar, StringOrBoolean, StringOrNumber};
-pub use self::switch::Switch;
+pub use self::{
+    doc::{Doc, DocRef},
+    endian::Endian,
+    scalar::{AnyNonNullScalar, AnyScalar, StringOrBoolean, StringOrNumber},
+    switch::Switch,
+};
 
 pub type MimeType = String;
 pub type IsoIdentifier = String;

@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 proc-macro2 = { version = "1", default-features = false }
 quote = "1.0"
-convert_case = "0.3.2"
+heck = "0.3"
 kaitai-loader = { path = "../kaitai-loader" }
 syn = "1.0"
 

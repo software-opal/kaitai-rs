@@ -3,18 +3,22 @@ use crate::expr::{IResult, Span};
 use nom::{
     branch::alt,
     character::complete::{char, one_of},
-    combinator::{map, recognize},
+    combinator::{map, recognize, value},
     multi::many0,
-    sequence::tuple,
+    sequence::tuple, bytes::complete::tag,
 };
-use super::{name::name_expr, numbers::{integer_expr, float_expr}, strings::string_expr};
+use super::{name::name_expr, numbers::{integer_expr, float_expr}, strings::string_expr, utils::ws};
+
+pub fn empty_list_expr(input: Span) -> IResult<ast::Expression> {
+    map(tuple((tag("["), ws, tag("]"))), |_| ast::Expression::List(vec![]))(input)
+}
 
 
 pub fn atom_expr(input: Span) -> IResult<ast::Expression> {
 
 
     alt((
-        // empty_list_expr,
+        empty_list_expr,
         // enum_by_name_expr,
         // byte_size_of_type_expr,
         // bit_size_of_type_expr,

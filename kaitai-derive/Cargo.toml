@@ -12,7 +12,7 @@ proc-macro = true
 [dependencies]
 proc-macro2 = { version = "1", default-features = false }
 quote = "1.0"
-convert_case = "0.3.2"
+heck = "0.3"
 kaitai-codegen = { path = "../kaitai-codegen" }
 syn = "1.0"
 

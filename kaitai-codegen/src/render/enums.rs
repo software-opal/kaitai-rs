@@ -1,12 +1,12 @@
-use convert_case::{Case, Casing};
 use kaitai_loader::raw::enums::{EnumSpec, EnumValueSpec};
 use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
 use std::{collections::BTreeMap, str::FromStr};
 use crate::utils;
+use heck::CamelCase;
 
 pub fn map_enum_name(_key: &str, spec: &EnumValueSpec) -> String {
-    spec.id.to_case(Case::UpperCamel)
+    spec.id.to_camel_case()
 }
 pub fn string_to_ident(name: &str) -> Ident {
     utils::ident(name)

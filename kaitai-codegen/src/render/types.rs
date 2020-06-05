@@ -1,5 +1,4 @@
 use crate::utils;
-use convert_case::{Case, Casing};
 use kaitai_loader::{
     raw::{attrs::Attribute, types::TypeSpec},
     resolver::{
@@ -13,9 +12,10 @@ use kaitai_loader::{
 use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::BTreeMap;
+use heck::CamelCase;
 
 pub fn attribute_enum_name(type_name: &str, attr_name: &str) -> String {
-    type_name.to_owned() + &attr_name.to_case(Case::UpperCamel)
+    type_name.to_owned() + &attr_name.to_camel_case()
 }
 
 const DEFAULT_ATTRIBUTE_NAME: &str = "unknown";

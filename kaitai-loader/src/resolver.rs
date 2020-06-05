@@ -1,11 +1,9 @@
-use std::collections::BTreeMap;
-
-use convert_case::{Case, Casing};
-
 use crate::{
     raw::{enums::EnumSpec, root::KsySpec, types::TypeSpec},
     resolver::enums::EnumPathSegment,
 };
+use std::collections::BTreeMap;
+use heck::CamelCase;
 
 pub mod attrs;
 pub mod enums;
@@ -24,16 +22,16 @@ pub struct ResolvedKsySpec<'a> {
 pub fn default_enum_name_mapper(segments: &[EnumPathSegment<'_>]) -> String {
     segments.iter().fold("".to_owned(), |acc, item| {
         acc + &(match item {
-            EnumPathSegment::Type(v) => v,
-            EnumPathSegment::Enum(v) => v,
+            EnumPathSegment::Type(v) => *v,
+            EnumPathSegment::Enum(v) => *v,
         })
-        .to_case(Case::UpperCamel)
+        .to_camel_case()
     })
 }
 pub fn default_type_name_mapper(segments: &[&str]) -> String {
-    segments.iter().fold("".to_owned(), |acc, item| {
-        acc + &item.to_case(Case::UpperCamel)
-    })
+    segments
+        .iter()
+        .fold("".to_owned(), |acc, &item| acc + &item.to_camel_case())
 }
 
 impl<'a> ResolvedKsySpec<'a> {

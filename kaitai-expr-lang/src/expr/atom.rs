@@ -1,27 +1,34 @@
+use super::{
+    name::name_expr,
+    numbers::{float_expr, integer_expr},
+    strings::string_expr,
+    test::test_expr,
+    utils::{maybe_ws_tag, ws}, expr::{enum_by_name_expr, list_expr, byte_size_of_type_expr, bit_size_of_type_expr},
+};
 use crate::ast;
 use crate::expr::{IResult, Span};
 use nom::{
     branch::alt,
-    character::complete::{char, one_of},
-    combinator::{map, recognize, value},
-    multi::many0,
-    sequence::tuple, bytes::complete::tag,
+    bytes::complete::tag,
+    combinator::map,
+    sequence::{delimited, tuple},
 };
-use super::{name::name_expr, numbers::{integer_expr, float_expr}, strings::string_expr, utils::ws};
 
 pub fn empty_list_expr(input: Span) -> IResult<ast::Expression> {
-    map(tuple((tag("["), ws, tag("]"))), |_| ast::Expression::List(vec![]))(input)
+    map(tuple((tag("["), ws, tag("]"))), |_| {
+        ast::Expression::List(vec![])
+    })(input)
 }
 
-
 pub fn atom_expr(input: Span) -> IResult<ast::Expression> {
-
-
     alt((
         empty_list_expr,
-        // enum_by_name_expr,
-        // byte_size_of_type_expr,
-        // bit_size_of_type_expr,
+        // empty_dict_expr,
+        delimited(maybe_ws_tag("("), test_expr, maybe_ws_tag(")")),
+        delimited(maybe_ws_tag("["), list_expr, maybe_ws_tag("]")),
+        enum_by_name_expr,
+        byte_size_of_type_expr,
+        bit_size_of_type_expr,
         string_expr,
         name_expr,
         float_expr,

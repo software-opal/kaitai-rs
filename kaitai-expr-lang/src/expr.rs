@@ -1,12 +1,16 @@
 use crate::ast;
-use nom::{branch::alt, combinator::complete};
+use nom::combinator::complete;
+use test::test_expr;
 use thiserror::Error;
 
-mod utils;
-mod numbers;
-mod name;
-mod strings;
+mod arith;
 mod atom;
+mod expr;
+mod name;
+mod numbers;
+mod strings;
+mod test;
+mod utils;
 
 type Span<'a> = &'a str;
 type IResult<'a, T> = nom::IResult<Span<'a>, T>;
@@ -24,7 +28,7 @@ impl From<nom::Err<(&'_ str, nom::error::ErrorKind)>> for ExpressionError {
 }
 
 fn parser(input: Span) -> IResult<ast::Expression> {
-    complete(alt((strings::string_expr, numbers::float_expr, numbers::integer_expr)))(input)
+    complete(test_expr)(input)
 }
 
 pub fn parse(input: &str) -> Result<ast::Expression> {

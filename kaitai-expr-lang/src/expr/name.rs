@@ -1,10 +1,12 @@
+use super::utils::ws;
 use crate::ast;
 use crate::expr::{IResult, Span};
 use nom::{
     branch::alt,
+    bytes::complete::tag,
     character::complete::{char, one_of},
-    combinator::{map, recognize},
-    multi::many0,
+    combinator::{map, opt, recognize},
+    multi::{many0, separated_nonempty_list},
     sequence::tuple,
 };
 
@@ -38,6 +40,35 @@ pub fn identifier(input: Span) -> IResult<Span> {
     ));
     recognize(tuple((ident_start, (many0(ident_rest)))))(input)
 }
+pub fn identifier_ident(input: Span) -> IResult<ast::Identifier> {
+    map(identifier, |name| ast::Identifier {
+        name: name.to_owned(),
+    })(input)
+}
+
+pub fn type_name(input: Span) -> IResult<ast::TypeId> {
+    // val TYPE_NAME: P[Ast.typeId] = P("::".!.? ~ NAME.rep(1, "::") ~ ("[" ~ "]").!.?).map {
+    //     case (first, names: Seq[Ast.identifier], arrayStr) =>
+    //       Ast.typeId(first.nonEmpty, names.map((el) => el.name), arrayStr.nonEmpty)
+    // }
+    let maybe_absolute = map(opt(tag("::")), |option: Option<_>| option.is_some());
+    let maybe_array = map(opt(tuple((tag("["), ws, tag("]")))), |option: Option<_>| {
+        option.is_some()
+    });
+    map(
+        tuple((
+            maybe_absolute,
+            separated_nonempty_list(tag("::"), identifier),
+            maybe_array,
+        )),
+        |(absolute, names, is_array)| ast::TypeId {
+            absolute,
+            names: names.into_iter().map(|name| name.to_owned()).collect(),
+            is_array,
+        },
+    )(input)
+}
+
 pub fn name_expr(input: Span) -> IResult<ast::Expression> {
     map(identifier, |name| match name {
         "true" => ast::Expression::Bool(true),
